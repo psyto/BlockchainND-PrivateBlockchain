@@ -59,7 +59,6 @@ class Blockchain{
   	await this.addDataToLevelDB(newBlock.height, JSON.stringify(newBlock).toString());
   }
 
-  // Get block height
 	// getBlockHeight() function retrieves current block height within the LevelDB chain.
     async getBlockHeight(){
       return await this.getBlockHeightFromLevelDB();
@@ -71,11 +70,10 @@ class Blockchain{
       return JSON.parse(await this.getLevelDBData(blockHeight));
     }
 
-    // validate block
 		// validate block() function to validate a block stored within levelDB.
     validateBlock(blockHeight){
       // get block object
-      let block = this.getBlock(blockHeight);
+      let block = await this.getBlock(blockHeight);
       // get block hash
       let blockHash = block.hash;
       // remove block hash to test block integrity
@@ -91,16 +89,16 @@ class Blockchain{
         }
     }
 
-   // Validate blockchain
 	 // validateChain() function to validate blockchain stored within levelDB.
     validateChain(){
       let errorLog = [];
-      for (var i = 0; i < this.chain.length-1; i++) {
+			const height = await this.getBlockHeightFromLevelDB();
+      for (var i = 0; i < height; i++) {
         // validate block
         if (!this.validateBlock(i))errorLog.push(i);
         // compare blocks hash link
-        let blockHash = this.chain[i].hash;
-        let previousHash = this.chain[i+1].previousBlockHash;
+        let blockHash = this.getBlock(i).hash;
+        let previousHash = this.getBlock(i+1).previousBlockHash;
         if (blockHash!==previousHash) {
           errorLog.push(i);
         }
@@ -165,9 +163,12 @@ getBlockHeightFromLevelDB(){
 |     ( new block every 10 minutes )                                           |
 |  ===========================================================================*/
 
+let blockchain = new Blockchain();
+
 (function theLoop (i) {
   setTimeout(function () {
-    addDataToLevelDB('Testing data');
-    if (--i) theLoop(i);
+		blockchain.addBlock(new Block("Test Block - " (i + 1))).then((result) => {
+			if (--i) theLoop(i);
+		})
   }, 100);
 })(10);
