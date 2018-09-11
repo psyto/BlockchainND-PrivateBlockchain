@@ -4,6 +4,8 @@
 
 const SHA256 = require('crypto-js/sha256');
 
+// SimpleChain.js includes the Node.js level library and configured to persist data within the project directory.
+
 
 /* ===== Block Class ==============================
 |  Class with a constructor for block 			   |
@@ -25,11 +27,13 @@ class Block{
 
 class Blockchain{
   constructor(){
+		// Genesis block persist as the first block in the blockchain using LevelDB.
     this.chain = [];
     this.addBlock(new Block("First block in the chain - Genesis block"));
   }
 
   // Add new block
+	// addBlock(newBlock) includes a method to store newBlock within LevelDB.
   addBlock(newBlock){
     // Block height
     newBlock.height = this.chain.length;
@@ -46,17 +50,20 @@ class Blockchain{
   }
 
   // Get block height
+	// getBlockHeight() function retrieves current block height within the LevelDB chain.
     getBlockHeight(){
       return this.chain.length-1;
     }
 
     // get block
+		// getBlock() function retrieves a block by block height within the LevelDB chain.
     getBlock(blockHeight){
       // return object as a single string
       return JSON.parse(JSON.stringify(this.chain[blockHeight]));
     }
 
     // validate block
+		// validate block() function to validate a block stored within levelDB.
     validateBlock(blockHeight){
       // get block object
       let block = this.getBlock(blockHeight);
@@ -76,6 +83,7 @@ class Blockchain{
     }
 
    // Validate blockchain
+	 // validateChain() function to validate blockchain stored within levelDB.
     validateChain(){
       let errorLog = [];
       for (var i = 0; i < this.chain.length-1; i++) {
