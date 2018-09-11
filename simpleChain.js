@@ -33,12 +33,13 @@ class Block{
 class Blockchain{
   constructor(){
 		// Genesis block persist as the first block in the blockchain using LevelDB.
-    // this.chain = [];
-    // this.addBlock(new Block("First block in the chain - Genesis block"));
-
+		this.getBlockHeight().then((height) => {
+			if (height === -1) {
+				this.addBlock(new Block("First block in the chain - Genesis block"));
+			}
+		})
   }
 
-  // Add new block
 	// addBlock(newBlock) includes a method to store newBlock within LevelDB.
   async addBlock(newBlock){
     // Previous block height
@@ -55,20 +56,19 @@ class Blockchain{
     // Block hash with SHA256 using newBlock and converting to a string
     newBlock.hash = SHA256(JSON.stringify(newBlock)).toString();
     // Adding block object to chain
-  	await this.addLevelDBData(newBlock.height, JSON.stringify(newBlock));
+  	await this.addDataToLevelDB(newBlock.height, JSON.stringify(newBlock).toString());
   }
 
   // Get block height
 	// getBlockHeight() function retrieves current block height within the LevelDB chain.
-    getBlockHeight(){
-      return this.chain.length-1;
+    async getBlockHeight(){
+      return await this.getBlockHeightFromLevelDB();
     }
 
-    // get block
 		// getBlock() function retrieves a block by block height within the LevelDB chain.
-    getBlock(blockHeight){
+    async getBlock(blockHeight){
       // return object as a single string
-      return JSON.parse(JSON.stringify(this.chain[blockHeight]));
+      return JSON.parse(await this.getLevelDBData(blockHeight));
     }
 
     // validate block
@@ -115,7 +115,7 @@ class Blockchain{
 }
 
 // Add data to levelDB with key/value pair
-addLevelDBData(key,value){
+addDataToLevelDB(key,value){
 	return new Promise((resolve, reject) => {
   	db.put(key, value, (err) => {
     	if (err) {
@@ -140,17 +140,18 @@ getLevelDBData(key){
 	})
 }
 
-// Add data to levelDB with value
-function addDataToLevelDB(value) {
-    let i = 0;
-    db.createReadStream().on('data', function(data) {
-          i++;
-        }).on('error', function(err) {
-            return console.log('Unable to read data stream!', err)
-        }).on('close', function() {
-          console.log('Block #' + i);
-          addLevelDBData(i, value);
-        });
+// Get block height from levelDB
+getBlockHeightFromLevelDB(){
+	return new Promise((resolve, reject) => {
+		let height = -1;
+		db.createReadStream().on('data', (data) => {
+			height++;
+		}).on('error', (err) => {
+			reject(err);
+		}).on('close', () => {
+			resolve(height);
+		})
+	})
 }
 
 /* ===== Testing ==============================================================|
@@ -163,7 +164,6 @@ function addDataToLevelDB(value) {
 |    Bitcoin blockchain adds 8640 blocks per day                               |
 |     ( new block every 10 minutes )                                           |
 |  ===========================================================================*/
-
 
 (function theLoop (i) {
   setTimeout(function () {
