@@ -71,7 +71,7 @@ class Blockchain{
 	}
 
 	// validate block() function to validate a block stored within levelDB.
-	validateBlock(blockHeight){
+	async validateBlock(blockHeight){
 		// get block object
 		let block = await this.getBlock(blockHeight);
 		// get block hash
@@ -90,7 +90,7 @@ class Blockchain{
 	}
 
 	// validateChain() function to validate blockchain stored within levelDB.
-	validateChain(){
+	async validateChain(){
 		let errorLog = [];
 		const height = await this.getBlockHeightFromLevelDB();
 		for (var i = 0; i < height; i++) {
