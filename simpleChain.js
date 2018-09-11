@@ -110,46 +110,48 @@ class Blockchain{
 			console.log('No errors detected');
 		}
 	}
-}
 
-// Add data to levelDB with key/value pair
-addDataToLevelDB(key,value){
-	return new Promise((resolve, reject) => {
-		db.put(key, value, (err) => {
-			if (err) {
-				reject(err);
-			} else {
-				resolve(value);
-			}
-		})
-	})
-}
 
-// Get data from levelDB with key
-getLevelDBData(key){
-	return new Promise((resolve, reject) => {
-		db.get(key, (err, value) => {
-			if (err) {
-				reject(err);
-			} else {
-				resolve(value);
-			}
-		})
-	})
-}
+  // Add data to levelDB with key/value pair
+  addDataToLevelDB(key,value){
+  	return new Promise((resolve, reject) => {
+  		db.put(key, value, (err) => {
+  			if (err) {
+  				reject(err);
+  			} else {
+  				resolve(value);
+  			}
+  		})
+  	})
+  }
 
-// Get block height from levelDB
-getBlockHeightFromLevelDB(){
-	return new Promise((resolve, reject) => {
-		let height = -1;
-		db.createReadStream().on('data', (data) => {
-			height++;
-		}).on('error', (err) => {
-			reject(err);
-		}).on('close', () => {
-			resolve(height);
-		})
-	})
+  // Get data from levelDB with key
+  getLevelDBData(key){
+  	return new Promise((resolve, reject) => {
+  		db.get(key, (err, value) => {
+  			if (err) {
+  				reject(err);
+  			} else {
+  				resolve(value);
+  			}
+  		})
+  	})
+  }
+
+  // Get block height from levelDB
+  getBlockHeightFromLevelDB(){
+  	return new Promise((resolve, reject) => {
+  		let height = -1;
+  		db.createReadStream().on('data', (data) => {
+  			height++;
+  		}).on('error', (err) => {
+  			reject(err);
+  		}).on('close', () => {
+  			resolve(height);
+  		})
+  	})
+  }
+
 }
 
 /* ===== Testing ==============================================================|
