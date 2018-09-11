@@ -115,18 +115,29 @@ class Blockchain{
 }
 
 // Add data to levelDB with key/value pair
-function addLevelDBData(key,value){
-  db.put(key, value, function(err) {
-    if (err) return console.log('Block ' + key + ' submission failed', err);
-  })
+addLevelDBData(key,value){
+	return new Promise((resolve, reject) => {
+  	db.put(key, value, (err) => {
+    	if (err) {
+				reject(err);
+			} else {
+				resolve(value);
+			}
+  	})
+	})
 }
 
 // Get data from levelDB with key
-function getLevelDBData(key){
-  db.get(key, function(err, value) {
-    if (err) return console.log('Not found!', err);
-    console.log('Value = ' + value);
-  })
+getLevelDBData(key){
+	return new Promise((resolve, reject) => {
+		db.get(key, (err, value) => {
+    	if (err) {
+				reject(err);
+			} else {
+    		resolve(value);
+			}
+  	})
+	})
 }
 
 // Add data to levelDB with value
