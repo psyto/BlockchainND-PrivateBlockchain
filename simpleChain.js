@@ -100,10 +100,10 @@ class Blockchain{
 			let blockHash = await this.getBlock(i).hash;
       if (i <= height) {
 				let previousHash = await this.getBlock(i+1).previousBlockHash;
+      	if (blockHash!==previousHash) {
+					errorLog.push(i);
+				}
       }
-      if (blockHash!==previousHash) {
-				errorLog.push(i);
-			}
 		}
 		if (errorLog.length>0) {
 			console.log('Block errors = ' + errorLog.length);
