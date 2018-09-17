@@ -56,7 +56,7 @@ class Blockchain{
     // Block hash with SHA256 using newBlock and converting to a string
     newBlock.hash = SHA256(JSON.stringify(newBlock)).toString();
     // Adding block object to chain
-    await this.addDataToLevelDB(newBlock.height, JSON.stringify(newBlock).toString());
+    await this.addDataToLevelDB(newBlock.height, JSON.stringify(newBlock));
   }
 
   // getBlockHeight() function retrieves current block height within the LevelDB chain.
@@ -92,17 +92,16 @@ class Blockchain{
   // validateChain() function to validate blockchain stored within levelDB.
   async validateChain(){
     let errorLog = [];
-    const height = await this.getBlockHeightFromLevelDB();
-    for (var i = 0; i <= height; i++) {
+    let blockHeight = await this.getBlockHeightFromLevelDB();
+    for (let i = 0; i < blockHeight-1; i++) {
       // validate block
-      if (!this.validateBlock(i)) errorLog.push(i);
+      let isValid = await this.validateBlock(i);
+      if (!isValid) errorLog.push(i);
       // compare blocks hash link
       let blockHash = await this.getBlock(i).hash;
-      if (i <= height) {
-        let previousHash = await this.getBlock(i+1).previousBlockHash;
-        if (blockHash!==previousHash) {
-          errorLog.push(i);
-        }
+      let previousHash = await this.getBlock(i+1).previousBlockHash;
+      if (blockHash!==previousHash) {
+        errorLog.push(i);
       }
     }
     if (errorLog.length>0) {
@@ -112,7 +111,6 @@ class Blockchain{
       console.log('No errors detected');
     }
   }
-
 
   // Add data to levelDB with key/value pair
   addDataToLevelDB(key,value){
