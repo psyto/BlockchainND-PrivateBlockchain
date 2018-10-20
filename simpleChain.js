@@ -168,8 +168,8 @@ class Blockchain{
 let blockchain = new Blockchain();
 
 (function theLoop (i) {
-  setTimeout(function () {
-    blockchain.addBlock(new Block("Test Block - " (i + 1))).then((result) => {
+  setTimeout(function() {
+    blockchain.addBlock(new Block(`Test Block - ${i + 1}`)).then((result) => {
       if (--i) theLoop(i);
     })
   }, 100);
